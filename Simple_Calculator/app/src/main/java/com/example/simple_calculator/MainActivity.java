@@ -941,7 +941,16 @@ public class MainActivity extends AppCompatActivity {
                                 compute();
                             }
                             else{//only multiplication or division
-                                resultTextEditor.setText(value1*(value2/100) + "");
+                                BigDecimal v1 = new BigDecimal(Double.toString(value1));
+                                BigDecimal v2 = new BigDecimal(Double.toString(value2));
+                                BigDecimal hundred = new BigDecimal("100");
+
+                                if(multiplication) {
+                                    resultTextEditor.setText(v1.multiply(v2.divide(hundred)) + "");
+                                }
+                                else{
+                                    resultTextEditor.setText(v1.divide(v2.divide(hundred)) + "");
+                                }
                             }
                         }
                     }
@@ -993,7 +1002,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      *-----------------------------------------
-     *     * Additional private helper methods
+     * Additional private helper methods
      *-----------------------------------------
      */
 
