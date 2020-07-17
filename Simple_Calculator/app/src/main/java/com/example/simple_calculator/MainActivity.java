@@ -6,16 +6,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
+
 public class MainActivity extends AppCompatActivity {
     //Button Variables that associate with the button on the layout:
     Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9, buttonDecimal, buttonEqual,
-            buttonClean, buttonMod, buttonDivide, buttonMultiply, buttonSubtract, buttonAdd;
+            buttonClean, buttonPercent, buttonDivide, buttonMultiply, buttonSubtract, buttonAdd;
 
     //TextView Variables that display any contents on the screen:
     TextView infoTextEditor, resultTextEditor;
 
     //Class variables use to determine the operation state of calculator:
-    boolean addition, subtraction, multiplication, division, decimal, reminder, waitForValue2, equal;
+    boolean addition, subtraction, multiplication, division, percentage, decimal, waitForValue2, equal;
 
     //Class variables use to store operands' values:
     double previousValue = Double.NaN, previousResult, currentResult, value1, value2 = Double.NaN;
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         buttonDecimal = (Button) findViewById(R.id.btn_Dec);
         buttonEqual = (Button) findViewById(R.id.btn_Equ);
         buttonClean = (Button) findViewById(R.id.btnC);
-        buttonMod = (Button) findViewById(R.id.btn_mod);
+        buttonPercent = (Button) findViewById(R.id.btn_percent);
         buttonDivide = (Button) findViewById(R.id.btn_Div);
         buttonMultiply = (Button) findViewById(R.id.btn_Multiply);
         buttonSubtract = (Button) findViewById(R.id.btn_Sub);
@@ -61,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
         button0.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "0");
@@ -92,6 +99,11 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "1");
@@ -142,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "2");
@@ -192,6 +209,11 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "3");
@@ -242,6 +264,11 @@ public class MainActivity extends AppCompatActivity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "4");
@@ -292,6 +319,11 @@ public class MainActivity extends AppCompatActivity {
         button5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "5");
@@ -342,6 +374,11 @@ public class MainActivity extends AppCompatActivity {
         button6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "6");
@@ -392,6 +429,11 @@ public class MainActivity extends AppCompatActivity {
         button7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "7");
@@ -442,6 +484,11 @@ public class MainActivity extends AppCompatActivity {
         button8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "8");
@@ -492,6 +539,11 @@ public class MainActivity extends AppCompatActivity {
         button9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If there is percentage sign in front of it
+                if(percentage){
+                    buttonMultiply.performClick();
+                }
+
                 //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "9");
@@ -573,27 +625,36 @@ public class MainActivity extends AppCompatActivity {
                 //Make sure that there is operand and the add button has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '+') {
                     //If user want to change operation from the others to add before input value2
-                    if(lastChar == '-' || lastChar == '×'  || lastChar == '÷'  || lastChar == '%' ){
+                    if(lastChar == '-' || lastChar == '×'  || lastChar == '÷'){
                         infoTextEditor.setText(infoTextEditor.getText().toString().
                                 substring(0, infoTextEditor.getText().length()-1));
                     }
-                    if (!waitForValue2) {
-                        value1 = Double.parseDouble(infoTextEditor.getText() + "");
+
+                    if (!waitForValue2) {//no need to store previous operation result
+                        if(percentage){
+                            String value1String = infoTextEditor.getText().toString().
+                                    substring(0, infoTextEditor.getText().length()-1);
+                            value1 = Double.parseDouble(value1String);
+                            value1 = value1 /100;
+                        }
+                        else{
+                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                        }
                         waitForValue2 = true;
                     }
-                    else{
+                    else{//need to store previous operation result from resultTextEditor
                         try{
                             previousResult = value1 = Double.parseDouble(resultTextEditor.getText() + "");
                         }
                         catch(Exception e){
-                            previousResult = value1;
                             //do nothing, value1 remain same only change operator.
+                            previousResult = value1;
                         }
                     }
 
                     value2 = Double.NaN;
                     zerosAfterDecimal = "";
-                    subtraction = multiplication = division = reminder = decimal = equal = false;
+                    subtraction = multiplication = division = percentage = decimal = equal = false;
                     addition = true;
                     infoTextEditor.setText(infoTextEditor.getText() + "+");
                     resultTextEditor.setText(null);
@@ -615,15 +676,24 @@ public class MainActivity extends AppCompatActivity {
                 //Make sure that there is operand and the subtract button has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '-') {
                     //If user want to change operation from the others to subtract before input value2
-                    if(lastChar == '+' || lastChar == '×'  || lastChar == '÷'  || lastChar == '%' ){
+                    if(lastChar == '+' || lastChar == '×'  || lastChar == '÷'){
                         infoTextEditor.setText(infoTextEditor.getText().toString().
                                 substring(0, infoTextEditor.getText().length()-1));
                     }
-                    if (!waitForValue2) {
-                        value1 = Double.parseDouble(infoTextEditor.getText() + "");
+
+                    if (!waitForValue2) {//no need to store previous operation result
+                        if(percentage){
+                            String value1String = infoTextEditor.getText().toString().
+                                    substring(0, infoTextEditor.getText().length()-1);
+                            value1 = Double.parseDouble(value1String);
+                            value1 = value1 /100;
+                        }
+                        else{
+                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                        }
                         waitForValue2 = true;
                     }
-                    else{
+                    else{//need to store previous operation result from resultTextEditor
                         try{
                             previousResult = value1 = Double.parseDouble(resultTextEditor.getText() + "");
                         }
@@ -635,7 +705,7 @@ public class MainActivity extends AppCompatActivity {
 
                     value2 = Double.NaN;
                     zerosAfterDecimal = "";
-                    addition = multiplication = division = reminder = decimal = equal = false;
+                    addition = multiplication = division = percentage = decimal = equal = false;
                     subtraction = true;
                     infoTextEditor.setText(infoTextEditor.getText() + "-");
                     resultTextEditor.setText(null);
@@ -646,6 +716,9 @@ public class MainActivity extends AppCompatActivity {
         buttonMultiply.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                previousValue = Double.NaN;
+                previousOperator = null;
+
                 char lastChar;
                 try{
                     lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
@@ -654,21 +727,30 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                //Make sure that there is operand and the multiplybutton has not pressed yet
+                //Make sure that there is operand and the multiply button has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '×') {
                     String currentText = infoTextEditor.getText().toString();
                     //If user want to change operation from the others to multiply before input value2
-                    if(lastChar == '+' || lastChar == '-'  || lastChar == '÷'  || lastChar == '%' ){
+                    if(lastChar == '+' || lastChar == '-'  || lastChar == '÷'){
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1));
                     }
 
-                    try{
+                    //Determine previous operator
+                    try {
                         int value2Length = Double.toString(value2).length();
-                        if(!decimal){
-                            previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
-                        }
-                        else{
-                            previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                        if (!decimal) {
+                            if (percentage) {
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length));
+                            } else {
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
+                            }
+                        } else {
+                            if (percentage) {
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 2));
+                            } else {
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+
+                            }
                         }
                     }
                     catch(Exception e){
@@ -677,14 +759,23 @@ public class MainActivity extends AppCompatActivity {
 
                     //Situations that we need to obey math rule, for example: 2+2*2
                     if(previousOperator.equals("+") || previousOperator.equals("-")){
+                        //value1 and value2 is still remain the value as last operation
                         previousValue = value1;
                         value1 = value2;
                     }
-                    else {
-                        if (!waitForValue2) {
-                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                    else {//no addition or subtraction in last operation
+                        if (!waitForValue2) {//no need to store previous operation result
+                            if(percentage){
+                                String value1String = infoTextEditor.getText().toString().
+                                        substring(0, infoTextEditor.getText().length()-1);
+                                value1 = Double.parseDouble(value1String);
+                                value1 = value1 /100;
+                            }
+                            else{
+                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                            }
                             waitForValue2 = true;
-                        } else {
+                        } else {//need to store previous operation result from resultTextEditor
                             try {
                                 value1 = Double.parseDouble(resultTextEditor.getText() + "");
                             } catch (Exception e) {
@@ -695,7 +786,7 @@ public class MainActivity extends AppCompatActivity {
 
                     value2 = Double.NaN;
                     zerosAfterDecimal = "";
-                    addition = subtraction = division = reminder = decimal = equal = false;
+                    addition = subtraction = division = percentage = decimal = equal = false;
                     multiplication = true;
                     infoTextEditor.setText(infoTextEditor.getText() + "×");
                     resultTextEditor.setText(null);
@@ -706,6 +797,9 @@ public class MainActivity extends AppCompatActivity {
         buttonDivide.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                previousValue = Double.NaN;
+                previousOperator = null;
+
                 char lastChar;
                 try{
                     lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
@@ -718,17 +812,28 @@ public class MainActivity extends AppCompatActivity {
                 if(infoTextEditor.getText().length() != 0 && lastChar != '÷') {
                     String currentText = infoTextEditor.getText().toString();
                     //If user want to change operation from the others to multiply before input value2
-                    if(lastChar == '+' || lastChar == '-'  || lastChar == '×'  || lastChar == '%' ){
+                    if(lastChar == '+' || lastChar == '-'  || lastChar == '×'){
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1));
                     }
 
+                    //Determine previous operator
                     try{
                         int value2Length = Double.toString(value2).length();
                         if(!decimal){
-                            previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
+                            if(percentage){
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length));
+                            }
+                            else{
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
+                            }
                         }
                         else{
-                            previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                            if(percentage){
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 2));
+                            }
+                            else{
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                            }
                         }
                     }
                     catch(Exception e){
@@ -737,14 +842,23 @@ public class MainActivity extends AppCompatActivity {
 
                     //Situations that we need to obey math rule, for example: 2+2*2
                     if(previousOperator.equals("+") || previousOperator.equals("-")){
+                        //value1 and value2 is still remain the value as last operation
                         previousValue = value1;
                         value1 = value2;
                     }
-                    else{
-                        if (!waitForValue2) {
-                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                    else{//no addition or subtraction in last operation
+                        if (!waitForValue2) {//no need to store previous operation result
+                            if(percentage){
+                                String value1String = infoTextEditor.getText().toString().
+                                        substring(0, infoTextEditor.getText().length()-1);
+                                value1 = Double.parseDouble(value1String);
+                                value1 = value1 /100;
+                            }
+                            else{
+                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                            }
                             waitForValue2 = true;
-                        } else {
+                        } else {//need to store previous operation result from resultTextEditor
                             try {
                                 value1 = Double.parseDouble(resultTextEditor.getText() + "");
                             } catch (Exception e) {
@@ -753,9 +867,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
+                    //Since we need to know the value of the secondary operand, so the step of
+                    //determine previousValue is done in compute()
+
                     value2 = Double.NaN;
                     zerosAfterDecimal = "";
-                    addition = subtraction = multiplication = reminder = decimal = equal = false;
+                    addition = subtraction = multiplication = percentage = decimal = equal = false;
                     division = true;
                     infoTextEditor.setText(infoTextEditor.getText() + "÷");
                     resultTextEditor.setText(null);
@@ -763,8 +880,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Make sure that there is operand and the mod button has not pressed yet
-        buttonMod.setOnClickListener(new View.OnClickListener(){
+        buttonPercent.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 char lastChar;
@@ -775,50 +891,68 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                if(infoTextEditor.getText().length() != 0 && lastChar != '%') {
+                //Make sure that there is operand and any operator buttons include itself has not pressed yet
+                if(infoTextEditor.getText().length() != 0 && lastChar != '%'
+                        && lastChar != '+' && lastChar != '-'  && lastChar != '×'  && lastChar != '÷') {
+
+                    infoTextEditor.setText(infoTextEditor.getText() + "%");
                     String currentText = infoTextEditor.getText().toString();
-                    //If user want to change operation from the others to multiply before input value2
-                    if(lastChar == '+' || lastChar == '-'  || lastChar == '×'  || lastChar == '÷' ){
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1));
-                    }
+                    String value; //Use to determine the value of operand that need to be percentage
+                    int percentageIndex = currentText.lastIndexOf("%"); //find the index of the last occurrence of %
 
-                    try{
-                        int value2Length = Double.toString(value2).length();
-                        if(!decimal){
-                            previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
-                        }
-                        else{
-                            previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
-                        }
-                    }
-                    catch(Exception e){
-                        previousOperator = "";
-                    }
+                    //Value2 should be value2% of the first operand, such as 5+50% = 7.5
+                    if(!Double.isNaN(value2)){
+                        if(multiplication && !Double.isNaN(previousValue)){//Has previous operation
+                            value2 = value1*(value2/100);
+                            value1 = previousValue;
+                            previousValue = Double.NaN;
+                            //Since we have already down the multiplication above
+                            multiplication = false;
 
-                    //Situations that we need to obey math rule, for example: 2+2*2
-                    if(previousOperator.equals("+") || previousOperator.equals("-")){
-                        previousValue = value1;
-                        value1 = value2;
-                    }
-                    else{
-                        if (!waitForValue2) {
-                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
-                            waitForValue2 = true;
-                        } else {
-                            try {
-                                value1 = Double.parseDouble(resultTextEditor.getText() + "");
-                            } catch (Exception e) {
-                                //do nothing, value1 remain same only change operator.
+                            if(previousOperator.equals("+")){
+                                addition = true;
+                            }
+                            else{
+                                subtraction = true;
+                            }
+                            //recalculate the result
+                            compute();
+                        }
+                        else if(division && !Double.isNaN(previousValue)){//Has previous operation
+                            value2 = value1/(value2/100);
+                            value1 = previousValue;
+                            previousValue = Double.NaN;
+                            //Since we have already down the division above
+                            division = false;
+
+                            if(previousOperator.equals("+")){
+                                addition = true;
+                            }
+                            else{
+                                subtraction = true;
+                            }
+                            //recalculate the result
+                            compute();
+                        }
+                        else{//no previous operation
+                            if(addition || subtraction){
+                                value2 = value1*(value2/100);
+                                //recalculate the result
+                                compute();
+                            }
+                            else{//only multiplication or division
+                                resultTextEditor.setText(value1*(value2/100) + "");
                             }
                         }
                     }
+                    else{
+                        //The first operand (value1) needs to be percentage
+                        value = currentText.substring(0, percentageIndex);
+                        resultTextEditor.setText(Double.parseDouble(value)/100 + "");
+                    }
 
-                    value2 = Double.NaN;
                     zerosAfterDecimal = "";
-                    addition = subtraction = multiplication = division  = decimal = equal = false;
-                    reminder = true;
-                    infoTextEditor.setText(infoTextEditor.getText() + "%");
-                    resultTextEditor.setText(null);
+                    percentage = true;
                 }
             }
         });
@@ -832,7 +966,7 @@ public class MainActivity extends AppCompatActivity {
                 zerosAfterDecimal = "";
                 infoTextEditor.setText(null);
                 resultTextEditor.setText(null);
-                waitForValue2 = addition = subtraction = multiplication = division = reminder = decimal = equal = false;
+                waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = equal = false;
             }
         });
 
@@ -849,7 +983,7 @@ public class MainActivity extends AppCompatActivity {
                     previousOperator = null;
                     zerosAfterDecimal = "";
                     equal = true;
-                    waitForValue2 = addition = subtraction = multiplication = division = reminder = decimal = false;
+                    waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = false;
                     infoTextEditor.setText(resultTextEditor.getText());
                     resultTextEditor.setText(null);
                 }
@@ -869,6 +1003,7 @@ public class MainActivity extends AppCompatActivity {
      * entered as an operand after any operator or any updates to the current operand.
      */
     private void compute() {
+        BigDecimal v1, v2, pV, cR;
         if(addition){
             resultTextEditor.setText(value1 + value2 + "");
         }
@@ -877,53 +1012,41 @@ public class MainActivity extends AppCompatActivity {
         }
         else if(multiplication){
             //Situations that we need to compute × firstly
-            if(!Double.isNaN(previousValue)){
+            if(!Double.isNaN(previousValue)){//need to calculate multiplication first
                 currentResult = value1 * value2;
+                pV = new BigDecimal(Double.toString(previousValue));
+                cR = new BigDecimal(Double.toString(currentResult));
+
                 if(previousOperator.equals("+")){
-                    resultTextEditor.setText(previousValue + currentResult + "");
+                    resultTextEditor.setText(pV.add(cR) + "");
                 }
                 else if(previousOperator.equals("-")){
-                    resultTextEditor.setText(previousValue - currentResult + "");
+                    resultTextEditor.setText(pV.subtract(cR) + "");
                 }
-                previousValue = Double.NaN;
-                previousOperator = null;
             }
-            else{
-                resultTextEditor.setText(value1 * value2 + "");
+            else{//no need to calculate multiplication first
+                v1 = new BigDecimal(Double.toString(value1));
+                v2 = new BigDecimal(Double.toString(value2));
+                resultTextEditor.setText(v1.multiply(v2) + "");
             }
+
         }
-        else if(division){
+        else if(division) {
             //Situations that we need to compute ÷ firstly
-            if(!Double.isNaN(previousValue)){
+            if (!Double.isNaN(previousValue)) {//need to calculate subtraction first
                 currentResult = value1 / value2;
-                if(previousOperator.equals("+")){
-                    resultTextEditor.setText(previousValue + currentResult + "");
+                pV = new BigDecimal(Double.toString(previousValue));
+                cR = new BigDecimal(Double.toString(currentResult));
+
+                if (previousOperator.equals("+")) {
+                    resultTextEditor.setText(pV.add(cR) + "");
+                } else if (previousOperator.equals("-")) {
+                    resultTextEditor.setText(pV.subtract(cR) + "");
                 }
-                else if(previousOperator.equals("-")){
-                    resultTextEditor.setText(previousValue - currentResult + "");
-                }
-                previousValue = Double.NaN;
-                previousOperator = null;
-            }
-            else{
-                resultTextEditor.setText(value1 / value2 + "");
-            }
-        }
-        else if(reminder) {
-            //Situations that we need to compute % firstly
-            if(!Double.isNaN(previousValue)){
-                currentResult = value1 % value2;
-                if(previousOperator.equals("+")){
-                    resultTextEditor.setText(previousValue + currentResult + "");
-                }
-                else if(previousOperator.equals("-")){
-                    resultTextEditor.setText(previousValue - currentResult + "");
-                }
-                previousValue = Double.NaN;
-                previousOperator = null;
-            }
-            else{
-                resultTextEditor.setText(value1 % value2 + "");
+            } else {//no need to calculate subtraction first
+                v1 = new BigDecimal(Double.toString(value1));
+                v2 = new BigDecimal(Double.toString(value2));
+                resultTextEditor.setText(v1.divide(v2) + "");
             }
         }
     }
