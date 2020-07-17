@@ -1,19 +1,26 @@
 package com.example.simple_calculator;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
 public class MainActivity extends AppCompatActivity {
+    //Button Variables that associate with the button on the layout:
     Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9, buttonDecimal, buttonEqual,
             buttonClean, buttonMod, buttonDivide, buttonMultiply, buttonSubtract, buttonAdd;
+
+    //TextView Variables that display any contents on the screen:
     TextView infoTextEditor, resultTextEditor;
+
+    //Class variables use to determine the operation state of calculator:
     boolean addition, subtraction, multiplication, division, decimal, reminder, waitForValue2, equal;
+
+    //Class variables use to store operands' values:
     double previousValue = Double.NaN, previousResult, currentResult, value1, value2 = Double.NaN;
+
+    //Class variables use to store previous operation's operator and how many zeros after decimal
     String previousOperator, zerosAfterDecimal = "";
 
     @Override
@@ -40,14 +47,21 @@ public class MainActivity extends AppCompatActivity {
         buttonMultiply = (Button) findViewById(R.id.btn_Multiply);
         buttonSubtract = (Button) findViewById(R.id.btn_Sub);
         buttonAdd = (Button) findViewById(R.id.btn_Add);
-        //Screen
+
+        //TextEditor
         infoTextEditor = (TextView) findViewById(R.id.infoText);
         resultTextEditor = (TextView) findViewById(R.id.resultText);
 
-        //Numerical Buttons' methods
+        /*
+         *-----------------------------------------
+         * Numerical Buttons' methods
+         *-----------------------------------------
+         */
+
         button0.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "0");
                 }
@@ -56,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 0;
                     compute();
@@ -76,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "1");
                 }
@@ -84,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 1;
@@ -123,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "2");
                 }
@@ -131,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 2;
@@ -170,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "3");
                 }
@@ -178,6 +201,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 3;
@@ -217,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "4");
                 }
@@ -225,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 4;
@@ -264,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
         button5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "5");
                 }
@@ -272,6 +301,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 5;
@@ -311,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
         button6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "6");
                 }
@@ -319,6 +351,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 6;
@@ -358,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
         button7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "7");
                 }
@@ -366,6 +401,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 7;
@@ -405,6 +442,7 @@ public class MainActivity extends AppCompatActivity {
         button8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "8");
                 }
@@ -413,6 +451,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 8;
@@ -452,6 +492,7 @@ public class MainActivity extends AppCompatActivity {
         button9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Display the button pressed on text editor
                 if(!equal){
                     infoTextEditor.setText(infoTextEditor.getText() + "9");
                 }
@@ -460,6 +501,8 @@ public class MainActivity extends AppCompatActivity {
                     equal = false;
                 }
 
+                //Automatically compute the result and display the result into
+                //resultTextEditor when a number got entered after the operator
                 String currentText = infoTextEditor.getText().toString();
                 if(waitForValue2 && Double.isNaN(value2)){
                     value2 = 9;
@@ -496,7 +539,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Functional buttons' methods
+        /*
+         *-----------------------------------------
+         * Operator buttons' methods
+         *-----------------------------------------
+         */
+
         buttonDecimal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -522,6 +570,7 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
+                //Make sure that there is operand and the add button has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '+') {
                     //If user want to change operation from the others to add before input value2
                     if(lastChar == '-' || lastChar == '×'  || lastChar == '÷'  || lastChar == '%' ){
@@ -563,6 +612,7 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
+                //Make sure that there is operand and the subtract button has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '-') {
                     //If user want to change operation from the others to subtract before input value2
                     if(lastChar == '+' || lastChar == '×'  || lastChar == '÷'  || lastChar == '%' ){
@@ -604,6 +654,7 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
+                //Make sure that there is operand and the multiplybutton has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '×') {
                     String currentText = infoTextEditor.getText().toString();
                     //If user want to change operation from the others to multiply before input value2
@@ -663,6 +714,7 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
+                //Make sure that there is operand and the divide button has not pressed yet
                 if(infoTextEditor.getText().length() != 0 && lastChar != '÷') {
                     String currentText = infoTextEditor.getText().toString();
                     //If user want to change operation from the others to multiply before input value2
@@ -711,6 +763,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Make sure that there is operand and the mod button has not pressed yet
         buttonMod.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -765,10 +818,12 @@ public class MainActivity extends AppCompatActivity {
                     addition = subtraction = multiplication = division  = decimal = equal = false;
                     reminder = true;
                     infoTextEditor.setText(infoTextEditor.getText() + "%");
-                    resultTextEditor.setText(null);                }
+                    resultTextEditor.setText(null);
+                }
             }
         });
 
+        //Clean button that resets all variables to initial state
         buttonClean.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -781,6 +836,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*
+         * Since compute method has down the calculation, the equal button
+         * will just put the content in resultTextEditor into infoTextEditor
+         * and clear the resultTextEditor
+         */
         buttonEqual.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -797,6 +857,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /*
+     *-----------------------------------------
+     *     * Additional private helper methods
+     *-----------------------------------------
+     */
+
+    /*
+     * Private method that will be called to calculate the result and display
+     * the result to resultTextEditor automatically, when there is a number
+     * entered as an operand after any operator or any updates to the current operand.
+     */
     private void compute() {
         if(addition){
             resultTextEditor.setText(value1 + value2 + "");
