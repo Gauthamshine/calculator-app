@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity {
     //Button Variables that associate with the button on the layout:
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //Only one zero can be entered at beginning, such as 0, or 1+0
-                if (!infoTextEditor.getText().equals("0") && value2 != 0) {
+                if (!infoTextEditor.getText().equals("0") && (value2 != 0 || decimal)) {
                     //Display the button pressed on text editor
                     if (!equal) {
                         infoTextEditor.setText(infoTextEditor.getText() + "0");
@@ -107,7 +106,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("1");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "1");
                     }
@@ -168,7 +170,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("2");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "2");
                     }
@@ -229,7 +234,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("3");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "3");
                     }
@@ -290,7 +298,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("4");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "4");
                     }
@@ -351,7 +362,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("5");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "5");
                     }
@@ -412,7 +426,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("6");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "6");
                     }
@@ -473,7 +490,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("7");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "7");
                     }
@@ -534,7 +554,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("8");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "8");
                     }
@@ -595,7 +618,10 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    if(value2 == 0){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("9");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
                         String currentText = infoTextEditor.getText().toString();
                         infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "9");
                     }
