@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class MainActivity extends AppCompatActivity {
     //Button Variables that associate with the button on the layout:
@@ -64,34 +65,34 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //If there is percentage sign in front of it
-                if(percentage){
+                if (percentage) {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "0");
-                }
-                else{
-                    infoTextEditor.setText("0");
-                    equal = false;
-                }
+                //Only one zero can be entered at beginning, such as 0, or 1+0
+                if (!infoTextEditor.getText().equals("0") && (value2 != 0 || decimal)) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        infoTextEditor.setText(infoTextEditor.getText() + "0");
+                    } else {
+                        infoTextEditor.setText("0");
+                        equal = false;
+                    }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 0;
-                    compute();
-                }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(decimal){
-                        zerosAfterDecimal += "0";
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 0;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (decimal) {
+                            zerosAfterDecimal += "0";
+                        } else {
+                            value2 = value2 * 10;
+                        }
+                        compute();
                     }
-                    else{
-                        value2 = value2 * 10;
-                    }
-                    compute();
                 }
             }
         });
@@ -106,7 +107,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "1");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("1");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "1");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "1");
+                    }
                 }
                 else{
                     infoTextEditor.setText("1");
@@ -126,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.1;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "1";
                             value2 = Double.parseDouble(newValue2);
@@ -161,7 +171,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "2");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("2");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "2");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "2");
+                    }
                 }
                 else{
                     infoTextEditor.setText("2");
@@ -181,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.2;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "2";
                             value2 = Double.parseDouble(newValue2);
@@ -216,7 +235,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "3");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("3");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "3");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "3");
+                    }
                 }
                 else{
                     infoTextEditor.setText("3");
@@ -236,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.3;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "3";
                             value2 = Double.parseDouble(newValue2);
@@ -271,7 +299,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "4");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("4");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "4");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "4");
+                    }
                 }
                 else{
                     infoTextEditor.setText("4");
@@ -291,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.4;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "4";
                             value2 = Double.parseDouble(newValue2);
@@ -326,7 +363,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "5");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("5");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "5");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "5");
+                    }
                 }
                 else{
                     infoTextEditor.setText("5");
@@ -346,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.5;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "5";
                             value2 = Double.parseDouble(newValue2);
@@ -381,7 +427,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "6");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("6");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "6");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "6");
+                    }
                 }
                 else{
                     infoTextEditor.setText("6");
@@ -401,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.6;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "6";
                             value2 = Double.parseDouble(newValue2);
@@ -436,7 +491,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "7");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("7");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "7");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "7");
+                    }
                 }
                 else{
                     infoTextEditor.setText("7");
@@ -456,7 +520,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.7;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "7";
                             value2 = Double.parseDouble(newValue2);
@@ -491,7 +555,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "8");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("8");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "8");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "8");
+                    }
                 }
                 else{
                     infoTextEditor.setText("8");
@@ -511,7 +584,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.8;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "8";
                             value2 = Double.parseDouble(newValue2);
@@ -546,7 +619,16 @@ public class MainActivity extends AppCompatActivity {
 
                 //Display the button pressed on text editor
                 if(!equal){
-                    infoTextEditor.setText(infoTextEditor.getText() + "9");
+                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                        infoTextEditor.setText("9");
+                    }
+                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
+                        String currentText = infoTextEditor.getText().toString();
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "9");
+                    }
+                    else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "9");
+                    }
                 }
                 else{
                     infoTextEditor.setText("9");
@@ -566,7 +648,7 @@ public class MainActivity extends AppCompatActivity {
                         value2 = value2 + 0.9;
                     }
                     //There are zeros after decimal
-                    else if(zerosAfterDecimal != ""){
+                    else if(!zerosAfterDecimal.equals("")){
                         if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
                             String newValue2 = value2 + zerosAfterDecimal + "9";
                             value2 = Double.parseDouble(newValue2);
@@ -1012,12 +1094,13 @@ public class MainActivity extends AppCompatActivity {
      * entered as an operand after any operator or any updates to the current operand.
      */
     private void compute() {
-        BigDecimal v1, v2, pV, cR;
+        BigDecimal v1, v2, pV, cR, result, resultBD;
+
         if(addition){
-            resultTextEditor.setText(value1 + value2 + "");
+            resultTextEditor.setText(format(value1 + value2));
         }
         else if(subtraction){
-            resultTextEditor.setText(value1 - value2 + "");
+            resultTextEditor.setText(format(value1 - value2));
         }
         else if(multiplication){
             //Situations that we need to compute × firstly
@@ -1027,36 +1110,57 @@ public class MainActivity extends AppCompatActivity {
                 cR = new BigDecimal(Double.toString(currentResult));
 
                 if(previousOperator.equals("+")){
-                    resultTextEditor.setText(pV.add(cR) + "");
+                    resultTextEditor.setText(format(pV.add(cR).doubleValue()));
                 }
                 else if(previousOperator.equals("-")){
-                    resultTextEditor.setText(pV.subtract(cR) + "");
+                    resultTextEditor.setText(format(pV.subtract(cR).doubleValue()));
                 }
             }
             else{//no need to calculate multiplication first
                 v1 = new BigDecimal(Double.toString(value1));
                 v2 = new BigDecimal(Double.toString(value2));
-                resultTextEditor.setText(v1.multiply(v2) + "");
+                resultTextEditor.setText(format(v1.multiply(v2).doubleValue()));
             }
 
         }
         else if(division) {
-            //Situations that we need to compute ÷ firstly
-            if (!Double.isNaN(previousValue)) {//need to calculate subtraction first
-                currentResult = value1 / value2;
-                pV = new BigDecimal(Double.toString(previousValue));
-                cR = new BigDecimal(Double.toString(currentResult));
 
-                if (previousOperator.equals("+")) {
-                    resultTextEditor.setText(pV.add(cR) + "");
-                } else if (previousOperator.equals("-")) {
-                    resultTextEditor.setText(pV.subtract(cR) + "");
+            //Situations that we need to compute ÷ firstly
+            if (value2 != 0) {//O cannot be divisor
+                if (!Double.isNaN(previousValue)) {//need to calculate subtraction first
+                    currentResult = value1 / value2;
+
+                    if (previousOperator.equals("+")) {
+                        result = new BigDecimal(Double.toString(previousValue + currentResult));
+                        resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
+                    } else if (previousOperator.equals("-")) {
+                        result = new BigDecimal(Double.toString(previousValue - currentResult));
+                        resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
+                    }
+                } else {//no need to calculate subtraction first
+                    result = new BigDecimal(Double.toString(value1 / value2));
+                    resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                    resultTextEditor.setText(format(resultBD.doubleValue()));
                 }
-            } else {//no need to calculate subtraction first
-                v1 = new BigDecimal(Double.toString(value1));
-                v2 = new BigDecimal(Double.toString(value2));
-                resultTextEditor.setText(v1.divide(v2) + "");
             }
+        }
+    }
+
+    /*
+     * Private method that present Double without decimal as Integer,
+     * and remove unnecessary zeros after decimal.
+     *
+     * @param double input value that need to be formatted.
+     * @return String value that has been formatted.
+     */
+    private String format(double input) {
+        if(input == (long) input){
+            return String.format("%d",(long) input);
+        }
+        else {
+            return String.format("%s", input);
         }
     }
 }
