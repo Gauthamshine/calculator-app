@@ -1124,20 +1124,22 @@ public class MainActivity extends AppCompatActivity {
         }
         else if(division) {
             //Situations that we need to compute ÷ firstly
-            if (!Double.isNaN(previousValue)) {//need to calculate subtraction first
-                currentResult = value1 / value2;
-                pV = new BigDecimal(Double.toString(previousValue));
-                cR = new BigDecimal(Double.toString(currentResult));
+            if (value2 != 0) {//O cannot be divisor
+                if (!Double.isNaN(previousValue)) {//need to calculate subtraction first
+                    currentResult = value1 / value2;
+                    pV = new BigDecimal(Double.toString(previousValue));
+                    cR = new BigDecimal(Double.toString(currentResult));
 
-                if (previousOperator.equals("+")) {
-                    resultTextEditor.setText(format(pV.add(cR).doubleValue()));
-                } else if (previousOperator.equals("-")) {
-                    resultTextEditor.setText(format(pV.subtract(cR).doubleValue()));
+                    if (previousOperator.equals("+")) {
+                        resultTextEditor.setText(format(pV.add(cR).doubleValue()));
+                    } else if (previousOperator.equals("-")) {
+                        resultTextEditor.setText(format(pV.subtract(cR).doubleValue()));
+                    }
+                } else {//no need to calculate subtraction first
+                    v1 = new BigDecimal(Double.toString(value1));
+                    v2 = new BigDecimal(Double.toString(value2));
+                    resultTextEditor.setText(format(v1.divide(v2).doubleValue()));
                 }
-            } else {//no need to calculate subtraction first
-                v1 = new BigDecimal(Double.toString(value1));
-                v2 = new BigDecimal(Double.toString(value2));
-                resultTextEditor.setText(format(v1.divide(v2).doubleValue()));
             }
         }
     }
