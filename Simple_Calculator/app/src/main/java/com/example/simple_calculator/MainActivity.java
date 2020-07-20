@@ -8,9 +8,20 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
 
+/**
+ * Implement the main activity of the calculator app interface, that develop the method for
+ * each button's function.
+ *
+ * Note: Due to the time limit, I re-use the code from Boann in Evaluate class to evaluate
+ *       the parentheses arithmetic expression. However, it does not support the percentage function,
+ *       so currently the percentage button is disabled for parentheses operation.
+ *       In the future development, please revise the private method bracketCal to enable percentage in
+ *       parentheses operations.
+ *
+ * @author: Ziming(Pthahnil) Guo (ZGuo059@uOttawa.ca)
+ * @License: https://github.com/MikuFan239/Andriod_Calculator/blob/master/LICENSE
+ */
 public class MainActivity extends AppCompatActivity {
     //Button Variables that associate with the button on the layout:
     Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9, buttonDecimal, buttonEqual,
@@ -75,30 +86,53 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Only one zero can be entered at beginning, such as 0, or 1+0
-                if (!infoTextEditor.getText().equals("0") && (value2 != 0 || decimal)) {
-                    //Display the button pressed on text editor
-                    if (!equal) {
-                        infoTextEditor.setText(infoTextEditor.getText() + "0");
-                    } else {
-                        infoTextEditor.setText("0");
-                        equal = false;
+                if(!bracket) {
+                    //Only one zero can be entered at beginning, such as 0, or 1+0
+                    if (!infoTextEditor.getText().equals("0") && (value2 != 0 || decimal)) {
+                        //Display the button pressed on text editor
+                        if (!equal) {
+                            infoTextEditor.setText(infoTextEditor.getText() + "0");
+                        } else {
+                            infoTextEditor.setText("0");
+                            equal = false;
+                        }
+
+                        //Automatically compute the result and display the result into
+                        //resultTextEditor when a number got entered after the operator
+                        if (waitForValue2 && Double.isNaN(value2)) {
+                            value2 = 0;
+                            compute();
+                        } else if (waitForValue2 && !Double.isNaN(value2)) {
+                            //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                            if (decimal) {
+                                zerosAfterDecimal += "0";
+                            } else {
+                                value2 = value2 * 10;
+                            }
+                            compute();
+                        }
+                    }
+                }
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                    }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
 
-                    //Automatically compute the result and display the result into
-                    //resultTextEditor when a number got entered after the operator
-                    if (waitForValue2 && Double.isNaN(value2)) {
-                        value2 = 0;
-                        compute();
-                    } else if (waitForValue2 && !Double.isNaN(value2)) {
-                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                        if (decimal) {
-                            zerosAfterDecimal += "0";
-                        } else {
-                            value2 = value2 * 10;
-                        }
-                        compute();
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×0");
+                        bracketedOperation += "×0";
                     }
+                    else{
+                        infoTextEditor.setText(infoTextEditor.getText() + "0");
+                        bracketedOperation += "0";
+                    }
+
+                    value2 = bracketCal(bracketedOperation);
+                    compute();
                 }
             }
         });
@@ -111,59 +145,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("1");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "1");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "1");
+                        }
+                    } else {
                         infoTextEditor.setText("1");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "1");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "1");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("1");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 1;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 1;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.1;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "1";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "1";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "1";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 1;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.1;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "1";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "1";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "1";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×1");
+                        bracketedOperation += "×1";
                     }
                     else{
-                        value2 = value2 * 10 + 1;
+                        infoTextEditor.setText(infoTextEditor.getText() + "1");
+                        bracketedOperation += "1";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -175,59 +226,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("2");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "2");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "2");
+                        }
+                    } else {
                         infoTextEditor.setText("2");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "2");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "2");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("2");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 2;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 2;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.2;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "2";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "2";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "2";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 2;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.2;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "2";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "2";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "2";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×2");
+                        bracketedOperation += "×2";
                     }
                     else{
-                        value2 = value2 * 10 + 2;
+                        infoTextEditor.setText(infoTextEditor.getText() + "2");
+                        bracketedOperation += "2";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -239,59 +307,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("3");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "3");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "3");
+                        }
+                    } else {
                         infoTextEditor.setText("3");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "3");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "3");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("3");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 3;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 3;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.3;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "3";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "3";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "3";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 3;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.3;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "3";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "3";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "3";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×3");
+                        bracketedOperation += "×3";
                     }
                     else{
-                        value2 = value2 * 10 + 3;
+                        infoTextEditor.setText(infoTextEditor.getText() + "3");
+                        bracketedOperation += "3";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -303,59 +388,78 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("4");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "4");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "4");
+                        }
+                    } else {
                         infoTextEditor.setText("4");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "4");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "4");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("4");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 4;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 4;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.4;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "4";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "4";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "4";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 4;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.4;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "4";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "4";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "4";
-                        value2 = Double.parseDouble(newValue2);
+
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×4");
+                        bracketedOperation += "×4";
                     }
                     else{
-                        value2 = value2 * 10 + 4;
+                        infoTextEditor.setText(infoTextEditor.getText() + "4");
+                        bracketedOperation += "4";
+
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -367,59 +471,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("5");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "5");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "5");
+                        }
+                    } else {
                         infoTextEditor.setText("5");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "5");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "5");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("5");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 5;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 5;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.5;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "5";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "5";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "5";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 5;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.5;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "5";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "5";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "5";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×5");
+                        bracketedOperation += "×5";
                     }
                     else{
-                        value2 = value2 * 10 + 5;
+                        infoTextEditor.setText(infoTextEditor.getText() + "5");
+                        bracketedOperation += "5";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -431,59 +552,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("6");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "6");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "6");
+                        }
+                    } else {
                         infoTextEditor.setText("6");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "6");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "6");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("6");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 6;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 6;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.6;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "6";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "6";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "6";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 6;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.6;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "6";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "6";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "6";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×6");
+                        bracketedOperation += "×6";
                     }
                     else{
-                        value2 = value2 * 10 + 6;
+                        infoTextEditor.setText(infoTextEditor.getText() + "6");
+                        bracketedOperation += "6";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -495,59 +633,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("7");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "7");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "7");
+                        }
+                    } else {
                         infoTextEditor.setText("7");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "7");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "7");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("7");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 7;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 7;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.7;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "7";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "7";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "7";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 7;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.7;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "7";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "7";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "7";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×7");
+                        bracketedOperation += "×7";
                     }
                     else{
-                        value2 = value2 * 10 + 7;
+                        infoTextEditor.setText(infoTextEditor.getText() + "7");
+                        bracketedOperation += "7";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -559,59 +714,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("8");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "8");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "8");
+                        }
+                    } else {
                         infoTextEditor.setText("8");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "8");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "8");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("8");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 8;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 8;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.8;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "8";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "8";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "8";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 8;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.8;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "8";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "8";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "8";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×8");
+                        bracketedOperation += "×8";
                     }
                     else{
-                        value2 = value2 * 10 + 8;
+                        infoTextEditor.setText(infoTextEditor.getText() + "8");
+                        bracketedOperation += "8";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -623,59 +795,76 @@ public class MainActivity extends AppCompatActivity {
                     buttonMultiply.performClick();
                 }
 
-                //Display the button pressed on text editor
-                if(!equal){
-                    if(infoTextEditor.getText().equals("0")){//Situation that there is only 0 present
+                if(!bracket) {
+                    //Display the button pressed on text editor
+                    if (!equal) {
+                        if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
+                            infoTextEditor.setText("9");
+                        } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            String currentText = infoTextEditor.getText().toString();
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "9");
+                        } else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "9");
+                        }
+                    } else {
                         infoTextEditor.setText("9");
+                        equal = false;
                     }
-                    else if(value2 == 0 && !decimal){//Situation such as 1+0, if 1 has pressed we change to 1+1
-                        String currentText = infoTextEditor.getText().toString();
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1) + "9");
-                    }
-                    else {
-                        infoTextEditor.setText(infoTextEditor.getText() + "9");
-                    }
-                }
-                else{
-                    infoTextEditor.setText("9");
-                    equal = false;
-                }
 
-                //Automatically compute the result and display the result into
-                //resultTextEditor when a number got entered after the operator
-                String currentText = infoTextEditor.getText().toString();
-                if(waitForValue2 && Double.isNaN(value2)){
-                    value2 = 9;
-                    compute();
+                    //Automatically compute the result and display the result into
+                    //resultTextEditor when a number got entered after the operator
+                    String currentText = infoTextEditor.getText().toString();
+                    if (waitForValue2 && Double.isNaN(value2)) {
+                        value2 = 9;
+                        compute();
+                    } else if (waitForValue2 && !Double.isNaN(value2)) {
+                        //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
+                        if (currentText.charAt(infoTextEditor.getText().length() - 2) == '.') {
+                            value2 = value2 + 0.9;
+                        }
+                        //There are zeros after decimal
+                        else if (!zerosAfterDecimal.equals("")) {
+                            if (value2 % 1 != 0) {//Situation such as from 1.10 to 1.101
+                                String newValue2 = value2 + zerosAfterDecimal + "9";
+                                value2 = Double.parseDouble(newValue2);
+                            } else {//Situation such as from 1.0 to 1.01
+                                String value2String = Double.toString(value2);
+                                String newValue2 = value2String.substring(0, value2String.length() - 1) + zerosAfterDecimal + "9";
+                                value2 = Double.parseDouble(newValue2);
+                            }
+                        }
+                        //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
+                        else if (value2 % 1 != 0) {
+                            String newValue2 = value2 + "9";
+                            value2 = Double.parseDouble(newValue2);
+                        } else {
+                            value2 = value2 * 10 + 9;
+                        }
+                        compute();
+                    }
+                    zerosAfterDecimal = "";
                 }
-                else if(waitForValue2 && !Double.isNaN(value2)){
-                    //Decimal situation such as from 1.1 + 1. to 1.1 + 1.1
-                    if(currentText.charAt(infoTextEditor.getText().length()-2) == '.'){
-                        value2 = value2 + 0.9;
+                else{//To be revised if develop way to calculate parentheses with percentage button
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
                     }
-                    //There are zeros after decimal
-                    else if(!zerosAfterDecimal.equals("")){
-                        if(value2 % 1 != 0){//Situation such as from 1.10 to 1.101
-                            String newValue2 = value2 + zerosAfterDecimal + "9";
-                            value2 = Double.parseDouble(newValue2);
-                        }
-                        else{//Situation such as from 1.0 to 1.01
-                            String value2String = Double.toString(value2);
-                            String newValue2 = value2String.substring(0, value2String.length()-1) + zerosAfterDecimal + "9";
-                            value2 = Double.parseDouble(newValue2);
-                        }
+                    catch (Exception e){
+                        lastChar = ' ';
                     }
-                    //Decimal situation such as from 1.1 + 1.1 to 1.1 + 1.11 and so on.
-                    else if(value2 % 1 != 0){
-                        String newValue2 = value2 + "9";
-                        value2 = Double.parseDouble(newValue2);
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×9");
+                        bracketedOperation += "×9";
                     }
                     else{
-                        value2 = value2 * 10 + 9;
+                        infoTextEditor.setText(infoTextEditor.getText() + "9");
+                        bracketedOperation += "9";
                     }
+
+                    value2 = bracketCal(bracketedOperation);
                     compute();
                 }
-                zerosAfterDecimal = "";
             }
         });
 
@@ -688,13 +877,33 @@ public class MainActivity extends AppCompatActivity {
         buttonDecimal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(infoTextEditor.getText().length() == 0 || (waitForValue2 && Double.isNaN(value2))){
-                    infoTextEditor.setText(infoTextEditor.getText() + "0.");
-                    decimal = true;
+                if(!bracket) {
+                    if (infoTextEditor.getText().length() == 0 || (waitForValue2 && Double.isNaN(value2))) {
+                        infoTextEditor.setText(infoTextEditor.getText() + "0.");
+                        decimal = true;
+                    } else if (!decimal) {
+                        infoTextEditor.setText(infoTextEditor.getText() + ".");
+                        decimal = true;
+                    }
                 }
-                else if(! decimal){
-                    infoTextEditor.setText(infoTextEditor.getText() + ".");
-                    decimal = true;
+                else{
+                    char lastChar;
+                    try{
+                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                    }
+                    catch (Exception e){
+                        lastChar = ' ';
+                    }
+
+                    if(lastChar == ')'){//Add multiplication automatically
+                        infoTextEditor.setText(infoTextEditor.getText() + "×0.");
+                        bracketedOperation += "×0.";
+                    }
+                    else{
+                        infoTextEditor.setText(infoTextEditor.getText() + ".");
+                        bracketedOperation += ".";
+                    }
+
                 }
             }
         });
@@ -710,42 +919,47 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                //Make sure that there is operand and the add button has not pressed yet
-                if(infoTextEditor.getText().length() != 0 && lastChar != '+') {
-                    //If user want to change operation from the others to add before input value2
-                    if("-×÷".contains(lastChar + "")){
-                        infoTextEditor.setText(infoTextEditor.getText().toString().
-                                substring(0, infoTextEditor.getText().length()-1));
-                    }
+                if(!bracket) {
+                    //Make sure that there is operand and the add button has not pressed yet
+                    if (infoTextEditor.getText().length() != 0 && lastChar != '+') {
+                        //If user want to change operation from the others to add before input value2
+                        if ("-×÷".contains(lastChar + "")) {
+                            infoTextEditor.setText(infoTextEditor.getText().toString().
+                                    substring(0, infoTextEditor.getText().length() - 1));
+                        }
 
-                    if (!waitForValue2) {//no need to store previous operation result
-                        if(percentage){
-                            String value1String = infoTextEditor.getText().toString().
-                                    substring(0, infoTextEditor.getText().length()-1);
-                            value1 = Double.parseDouble(value1String);
-                            value1 = value1 /100;
+                        if (!waitForValue2) {//no need to store previous operation result
+                            if (percentage) {
+                                String value1String = infoTextEditor.getText().toString().
+                                        substring(0, infoTextEditor.getText().length() - 1);
+                                value1 = Double.parseDouble(value1String);
+                                value1 = value1 / 100;
+                            } else {
+                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                            }
+                            waitForValue2 = true;
+                        } else {//need to store previous operation result from resultTextEditor
+                            try {
+                                previousResult = value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                            } catch (Exception e) {
+                                //do nothing, value1 remain same only change operator.
+                                previousResult = value1;
+                            }
                         }
-                        else{
-                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
-                        }
-                        waitForValue2 = true;
-                    }
-                    else{//need to store previous operation result from resultTextEditor
-                        try{
-                            previousResult = value1 = Double.parseDouble(resultTextEditor.getText() + "");
-                        }
-                        catch(Exception e){
-                            //do nothing, value1 remain same only change operator.
-                            previousResult = value1;
-                        }
-                    }
 
-                    value2 = Double.NaN;
-                    zerosAfterDecimal = "";
-                    subtraction = multiplication = division = percentage = decimal = equal = false;
-                    addition = true;
-                    infoTextEditor.setText(infoTextEditor.getText() + "+");
-                    resultTextEditor.setText(null);
+                        value2 = Double.NaN;
+                        zerosAfterDecimal = "";
+                        subtraction = multiplication = division = percentage = decimal = equal = false;
+                        addition = true;
+                        infoTextEditor.setText(infoTextEditor.getText() + "+");
+                        resultTextEditor.setText(null);
+                    }
+                }
+                else{
+                    if(lastChar != '(') {
+                        infoTextEditor.setText(infoTextEditor.getText() + "+");
+                        bracketedOperation += "+";
+                    }
                 }
             }
         });
@@ -761,42 +975,47 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                //Make sure that there is operand and the subtract button has not pressed yet
-                if(infoTextEditor.getText().length() != 0 && lastChar != '-') {
-                    //If user want to change operation from the others to subtract before input value2
-                    if("+×÷".contains(lastChar + "")){
-                        infoTextEditor.setText(infoTextEditor.getText().toString().
-                                substring(0, infoTextEditor.getText().length()-1));
-                    }
+                if(!bracket) {
+                    //Make sure that there is operand and the subtract button has not pressed yet
+                    if (infoTextEditor.getText().length() != 0 && lastChar != '-') {
+                        //If user want to change operation from the others to subtract before input value2
+                        if ("+×÷".contains(lastChar + "")) {
+                            infoTextEditor.setText(infoTextEditor.getText().toString().
+                                    substring(0, infoTextEditor.getText().length() - 1));
+                        }
 
-                    if (!waitForValue2) {//no need to store previous operation result
-                        if(percentage){
-                            String value1String = infoTextEditor.getText().toString().
-                                    substring(0, infoTextEditor.getText().length()-1);
-                            value1 = Double.parseDouble(value1String);
-                            value1 = value1 /100;
+                        if (!waitForValue2) {//no need to store previous operation result
+                            if (percentage) {
+                                String value1String = infoTextEditor.getText().toString().
+                                        substring(0, infoTextEditor.getText().length() - 1);
+                                value1 = Double.parseDouble(value1String);
+                                value1 = value1 / 100;
+                            } else {
+                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                            }
+                            waitForValue2 = true;
+                        } else {//need to store previous operation result from resultTextEditor
+                            try {
+                                previousResult = value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                            } catch (Exception e) {
+                                previousResult = value1;
+                                //do nothing, value1 remain same only change operator.
+                            }
                         }
-                        else{
-                            value1 = Double.parseDouble(infoTextEditor.getText() + "");
-                        }
-                        waitForValue2 = true;
-                    }
-                    else{//need to store previous operation result from resultTextEditor
-                        try{
-                            previousResult = value1 = Double.parseDouble(resultTextEditor.getText() + "");
-                        }
-                        catch(Exception e){
-                            previousResult = value1;
-                            //do nothing, value1 remain same only change operator.
-                        }
-                    }
 
-                    value2 = Double.NaN;
-                    zerosAfterDecimal = "";
-                    addition = multiplication = division = percentage = decimal = equal = false;
-                    subtraction = true;
-                    infoTextEditor.setText(infoTextEditor.getText() + "-");
-                    resultTextEditor.setText(null);
+                        value2 = Double.NaN;
+                        zerosAfterDecimal = "";
+                        addition = multiplication = division = percentage = decimal = equal = false;
+                        subtraction = true;
+                        infoTextEditor.setText(infoTextEditor.getText() + "-");
+                        resultTextEditor.setText(null);
+                    }
+                }
+                else{
+                    if(lastChar != '(') {
+                        infoTextEditor.setText(infoTextEditor.getText() + "-");
+                        bracketedOperation += "-";
+                    }
                 }
             }
         });
@@ -815,76 +1034,80 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                //Make sure that there is operand and the multiply button has not pressed yet
-                if(infoTextEditor.getText().length() != 0 && lastChar != '×') {
-                    String currentText = infoTextEditor.getText().toString();
-                    //If user want to change operation from the others to multiply before input value2
-                    if("+-÷".contains(lastChar + "")){
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1));
-                    }
+                if(!bracket) {
+                    //Make sure that there is operand and the multiply button has not pressed yet
+                    if (infoTextEditor.getText().length() != 0 && lastChar != '×') {
+                        String currentText = infoTextEditor.getText().toString();
+                        //If user want to change operation from the others to multiply before input value2
+                        if ("+-÷".contains(lastChar + "")) {
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1));
+                        }
 
-                    //Determine previous operator
-                    try {
-                        if (!decimal) {
-                            if (percentage) {
-                                int value2Length = Double.toString(value2*100).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length));
+                        //Determine previous operator
+                        try {
+                            if (!decimal) {
+                                if (percentage) {
+                                    int value2Length = Double.toString(value2 * 100).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length));
+                                } else {
+                                    int value2Length = Double.toString(value2).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
+                                }
                             } else {
-                                int value2Length = Double.toString(value2).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
+                                if (percentage) {
+                                    int value2Length = Double.toString(value2 * 100).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                                } else {
+                                    int value2Length = Double.toString(value2).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                                }
                             }
-                        } else {
+                        } catch (Exception e) {
+                            previousOperator = "";
+                        }
+
+                        //Situations that we need to obey math rule, for example: 2+2*2
+                        if (previousOperator.equals("+") || previousOperator.equals("-")) {
                             if (percentage) {
-                                int value2Length = Double.toString(value2*100).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
-                            } else {
-                                int value2Length = Double.toString(value2).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                                previousValue = value1;
+                                value1 = beforePercentage / 100;
+                            } else {//value1 and value2 is still remain same value as last operation
+                                previousValue = value1;
+                                value1 = value2;
+                            }
+                        } else {//no addition or subtraction in last operation
+                            if (!waitForValue2) {//no need to store previous operation result
+                                if (percentage) {
+                                    String value1String = infoTextEditor.getText().toString().
+                                            substring(0, infoTextEditor.getText().length() - 1);
+                                    value1 = Double.parseDouble(value1String);
+                                    value1 = value1 / 100;
+                                } else {
+                                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                }
+                                waitForValue2 = true;
+                            } else {//need to store previous operation result from resultTextEditor
+                                try {
+                                    value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                                } catch (Exception e) {
+                                    //do nothing, value1 remain same only change operator.
+                                }
                             }
                         }
-                    }
-                    catch(Exception e){
-                        previousOperator = "";
-                    }
 
-                    //Situations that we need to obey math rule, for example: 2+2*2
-                    if(previousOperator.equals("+") || previousOperator.equals("-")){
-                        if(percentage){
-                            previousValue = value1;
-                            value1 = beforePercentage/100;
-                        }
-                        else {//value1 and value2 is still remain same value as last operation
-                            previousValue = value1;
-                            value1 = value2;
-                        }
+                        value2 = Double.NaN;
+                        zerosAfterDecimal = "";
+                        addition = subtraction = division = decimal = percentage = equal = false;
+                        multiplication = true;
+                        infoTextEditor.setText(infoTextEditor.getText() + "×");
+                        resultTextEditor.setText(null);
                     }
-                    else {//no addition or subtraction in last operation
-                        if (!waitForValue2) {//no need to store previous operation result
-                            if(percentage){
-                                String value1String = infoTextEditor.getText().toString().
-                                        substring(0, infoTextEditor.getText().length()-1);
-                                value1 = Double.parseDouble(value1String);
-                                value1 = value1 /100;
-                            }
-                            else{
-                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
-                            }
-                            waitForValue2 = true;
-                        } else {//need to store previous operation result from resultTextEditor
-                            try {
-                                value1 = Double.parseDouble(resultTextEditor.getText() + "");
-                            } catch (Exception e) {
-                                //do nothing, value1 remain same only change operator.
-                            }
-                        }
+                }
+                else{
+                    if(lastChar != '(') {
+                        infoTextEditor.setText(infoTextEditor.getText() + "×");
+                        bracketedOperation += "×";
                     }
-
-                    value2 = Double.NaN;
-                    zerosAfterDecimal = "";
-                    addition = subtraction = division = decimal = percentage = equal = false;
-                    multiplication = true;
-                    infoTextEditor.setText(infoTextEditor.getText() + "×");
-                    resultTextEditor.setText(null);
                 }
             }
         });
@@ -903,82 +1126,83 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                //Make sure that there is operand and the divide button has not pressed yet
-                if(infoTextEditor.getText().length() != 0 && lastChar != '÷') {
-                    String currentText = infoTextEditor.getText().toString();
-                    //If user want to change operation from the others to multiply before input value2
-                    if("+-×".contains(lastChar + "")){
-                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length()-1));
-                    }
+                if(!bracket) {
+                    //Make sure that there is operand and the divide button has not pressed yet
+                    if (infoTextEditor.getText().length() != 0 && lastChar != '÷') {
+                        String currentText = infoTextEditor.getText().toString();
+                        //If user want to change operation from the others to multiply before input value2
+                        if ("+-×".contains(lastChar + "")) {
+                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1));
+                        }
 
-                    //Determine previous operator
-                    try{
-                        if(!decimal){
-                            if(percentage){
-                                int value2Length = Double.toString(value2*100).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length));
+                        //Determine previous operator
+                        try {
+                            if (!decimal) {
+                                if (percentage) {
+                                    int value2Length = Double.toString(value2 * 100).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length));
+                                } else {
+                                    int value2Length = Double.toString(value2).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
+                                }
+                            } else {
+                                if (percentage) {
+                                    int value2Length = Double.toString(value2 * 100).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                                } else {
+                                    int value2Length = Double.toString(value2).length();
+                                    previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
+                                }
                             }
-                            else{
-                                int value2Length = Double.toString(value2).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length + 1));
-                            }
+                        } catch (Exception e) {
+                            previousOperator = "";
                         }
-                        else{
-                            if(percentage){
-                                int value2Length = Double.toString(value2*100).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
-                            }
-                            else{
-                                int value2Length = Double.toString(value2).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
-                            }
-                        }
-                    }
-                    catch(Exception e){
-                        previousOperator = "";
-                    }
 
-                    //Situations that we need to obey math rule, for example: 2+2*2
-                    if(previousOperator.equals("+") || previousOperator.equals("-")){
-                        if(percentage){
-                            previousValue = value1;
-                            value1 = beforePercentage/100;
-                        }
-                        else {//value1 and value2 is still remain same value as last operation
-                            previousValue = value1;
-                            value1 = value2;
-                        }
-                    }
-                    else{//no addition or subtraction in last operation
-                        if (!waitForValue2) {//no need to store previous operation result
-                            if(percentage){
-                                String value1String = infoTextEditor.getText().toString().
-                                        substring(0, infoTextEditor.getText().length()-1);
-                                value1 = Double.parseDouble(value1String);
-                                value1 = value1 /100;
+                        //Situations that we need to obey math rule, for example: 2+2*2
+                        if (previousOperator.equals("+") || previousOperator.equals("-")) {
+                            if (percentage) {
+                                previousValue = value1;
+                                value1 = beforePercentage / 100;
+                            } else {//value1 and value2 is still remain same value as last operation
+                                previousValue = value1;
+                                value1 = value2;
                             }
-                            else{
-                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
-                            }
-                            waitForValue2 = true;
-                        } else {//need to store previous operation result from resultTextEditor
-                            try {
-                                value1 = Double.parseDouble(resultTextEditor.getText() + "");
-                            } catch (Exception e) {
-                                //do nothing, value1 remain same only change operator.
+                        } else {//no addition or subtraction in last operation
+                            if (!waitForValue2) {//no need to store previous operation result
+                                if (percentage) {
+                                    String value1String = infoTextEditor.getText().toString().
+                                            substring(0, infoTextEditor.getText().length() - 1);
+                                    value1 = Double.parseDouble(value1String);
+                                    value1 = value1 / 100;
+                                } else {
+                                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                }
+                                waitForValue2 = true;
+                            } else {//need to store previous operation result from resultTextEditor
+                                try {
+                                    value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                                } catch (Exception e) {
+                                    //do nothing, value1 remain same only change operator.
+                                }
                             }
                         }
-                    }
 
-                    //Since we need to know the value of the secondary operand, so the step of
-                    //determine previousValue is done in compute()
+                        //Since we need to know the value of the secondary operand, so the step of
+                        //determine previousValue is done in compute()
 
-                    value2 = Double.NaN;
-                    zerosAfterDecimal = "";
-                    addition = subtraction = multiplication = decimal = percentage = equal = false;
-                    division = true;
-                    infoTextEditor.setText(infoTextEditor.getText() + "÷");
-                    resultTextEditor.setText(null);
+                        value2 = Double.NaN;
+                        zerosAfterDecimal = "";
+                        addition = subtraction = multiplication = decimal = percentage = equal = false;
+                        division = true;
+                        infoTextEditor.setText(infoTextEditor.getText() + "÷");
+                        resultTextEditor.setText(null);
+                    }
+                }
+                else{
+                    if(lastChar != '(') {
+                        infoTextEditor.setText(infoTextEditor.getText() + "÷");
+                        bracketedOperation += "÷";
+                    }
                 }
             }
         });
@@ -995,7 +1219,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //Make sure that there is operand and any operator buttons include itself has not pressed yet
-                if(infoTextEditor.getText().length() != 0 && !"+-×÷%(".contains(lastChar + "")) {
+                if(infoTextEditor.getText().length() != 0 && !"+-×÷%(".contains(lastChar + "") && !bracket) {
 
                     infoTextEditor.setText(infoTextEditor.getText() + "%");
                     String currentText = infoTextEditor.getText().toString();
@@ -1070,6 +1294,61 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        buttonBracket.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
+                if(infoTextEditor.getText().length() == 0){//Empty text
+                    infoTextEditor.setText(infoTextEditor.getText() + "(");
+                    bracketedOperation += "(";
+                    numberOfOpenBracket += 1;
+                    bracket = true;
+                }
+                else if (("0123456789".contains(lastChar + "") && !bracket) ||
+                        (lastChar == ')' && numberOfOpenBracket== numberOfCloseBracket)) {//If there is a number or closed bracket in front
+                    buttonMultiply.performClick();
+                    infoTextEditor.setText(infoTextEditor.getText() + "(");
+                    bracketedOperation += "(";
+                    numberOfOpenBracket += 1;
+                    bracket = true;
+                }
+                else {//Normal situation
+                    if ("+-×÷".contains(lastChar + "") || lastChar == '(') {//Continuously enter open bracket
+                        infoTextEditor.setText(infoTextEditor.getText() + "(");
+                        bracketedOperation += "(";
+                        numberOfOpenBracket += 1;
+                        bracket = true;
+                    }
+                    else if ("0123456789".contains(lastChar + "") || lastChar == ')'){//Situation to enter close bracket
+                        infoTextEditor.setText(infoTextEditor.getText() + ")");
+                        bracketedOperation += ")";//To be removed
+                        numberOfCloseBracket += 1;
+                        bracket = true;
+                    }
+                }
+
+                if(bracket && numberOfOpenBracket == numberOfCloseBracket){
+                    numberOfOpenBracket = numberOfCloseBracket = 0;
+                    bracketedOperation = "";
+                    bracket = false;
+                }
+            }
+        });
+
+        buttonSign.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         //Clean button that resets all variables to initial state
         buttonClean.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -1132,22 +1411,22 @@ public class MainActivity extends AppCompatActivity {
         }
         else if(multiplication){
             //Situations that we need to compute × firstly
-            if(!Double.isNaN(previousValue)){//need to calculate multiplication first
+            if (!Double.isNaN(previousValue)) {//need to calculate subtraction first
                 currentResult = value1 * value2;
-                pV = new BigDecimal(Double.toString(previousValue));
-                cR = new BigDecimal(Double.toString(currentResult));
 
-                if(previousOperator.equals("+")){
-                    resultTextEditor.setText(format(pV.add(cR).doubleValue()));
+                if (previousOperator.equals("+")) {
+                    result = new BigDecimal(Double.toString(previousValue + currentResult));
+                    resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                    resultTextEditor.setText(format(resultBD.doubleValue()));
+                } else if (previousOperator.equals("-")) {
+                    result = new BigDecimal(Double.toString(previousValue - currentResult));
+                    resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                    resultTextEditor.setText(format(resultBD.doubleValue()));
                 }
-                else if(previousOperator.equals("-")){
-                    resultTextEditor.setText(format(pV.subtract(cR).doubleValue()));
-                }
-            }
-            else{//no need to calculate multiplication first
-                v1 = new BigDecimal(Double.toString(value1));
-                v2 = new BigDecimal(Double.toString(value2));
-                resultTextEditor.setText(format(v1.multiply(v2).doubleValue()));
+            } else {//no need to calculate multiplication first
+                result = new BigDecimal(Double.toString(value1 * value2));
+                resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                resultTextEditor.setText(format(resultBD.doubleValue()));
             }
         }
         else if(division) {
@@ -1166,7 +1445,7 @@ public class MainActivity extends AppCompatActivity {
                         resultBD = result.setScale(10, RoundingMode.HALF_UP);
                         resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
-                } else {//no need to calculate subtraction first
+                } else {//no need to calculate division first
                     result = new BigDecimal(Double.toString(value1 / value2));
                     resultBD = result.setScale(10, RoundingMode.HALF_UP);
                     resultTextEditor.setText(format(resultBD.doubleValue()));
@@ -1174,6 +1453,22 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Private method that help to calculate the operation in parentheses
+     * which stored in the map called operationMap.
+     *
+     * Note: this method needs to be revised if developed the way
+     *       to calculate the parentheses involve percentage, and replace/revise the class Evaluate.
+     *
+     * @param operation the operation need to be calculated
+     * @return double the result of calculation
+     */
+    private double bracketCal(String operation){
+        Evaluate evaluate = new Evaluate();
+        return evaluate.eval(operation);
+    }
+
 
     /**
      * Private method that present Double without decimal as Integer,
