@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     TextView infoTextEditor, resultTextEditor;
 
     //Class variables use to determine the operation state of calculator:
-    boolean addition, subtraction, multiplication, division, percentage, decimal, waitForValue2, equal, bracket, sign;
+    boolean addition, subtraction, multiplication, division, percentage, decimal, waitForValue2, equal, emptyTextBracket, bracket, sign;
 
     //Class variables use to store operands' values:
     double previousValue = Double.NaN, previousResult, currentResult, value1, value2 = Double.NaN, beforePercentage;
@@ -81,6 +81,14 @@ public class MainActivity extends AppCompatActivity {
         button0.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if (percentage) {
                     buttonMultiply.performClick();
@@ -91,8 +99,14 @@ public class MainActivity extends AppCompatActivity {
                     if (!infoTextEditor.getText().equals("0") && (value2 != 0 || decimal)) {
                         //Display the button pressed on text editor
                         if (!equal) {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "0");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText("0");
                             equal = false;
                         }
@@ -112,16 +126,9 @@ public class MainActivity extends AppCompatActivity {
                             compute();
                         }
                     }
+                    emptyTextBracket = false;
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×0");
                         bracketedOperation += "×0";
@@ -131,8 +138,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "0";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -140,6 +153,14 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -151,12 +172,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("1");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "1");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "1");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("1");
                         equal = false;
                     }
@@ -192,17 +222,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×1");
                         bracketedOperation += "×1";
@@ -212,8 +235,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "1";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -221,6 +250,14 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -232,12 +269,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("2");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "2");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "2");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("2");
                         equal = false;
                     }
@@ -273,17 +319,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×2");
                         bracketedOperation += "×2";
@@ -293,8 +332,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "2";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -302,6 +347,14 @@ public class MainActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -313,12 +366,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("3");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "3");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "3");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("3");
                         equal = false;
                     }
@@ -354,17 +416,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×3");
                         bracketedOperation += "×3";
@@ -374,8 +429,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "3";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -383,6 +444,14 @@ public class MainActivity extends AppCompatActivity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -394,12 +463,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("4");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "4");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "4");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("4");
                         equal = false;
                     }
@@ -435,18 +513,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×4");
                         bracketedOperation += "×4";
@@ -457,15 +527,28 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
 
         button5.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -477,12 +560,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("5");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "5");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "5");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("5");
                         equal = false;
                     }
@@ -518,17 +610,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×5");
                         bracketedOperation += "×5";
@@ -538,8 +623,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "5";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -547,6 +638,14 @@ public class MainActivity extends AppCompatActivity {
         button6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -558,12 +657,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("6");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "6");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "6");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("6");
                         equal = false;
                     }
@@ -599,17 +707,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×6");
                         bracketedOperation += "×6";
@@ -619,8 +720,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "6";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -628,6 +735,14 @@ public class MainActivity extends AppCompatActivity {
         button7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -639,12 +754,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("7");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "7");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "7");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("7");
                         equal = false;
                     }
@@ -680,17 +804,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×7");
                         bracketedOperation += "×7";
@@ -700,8 +817,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "7";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -709,6 +832,14 @@ public class MainActivity extends AppCompatActivity {
         button8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -720,12 +851,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("8");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "8");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "8");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("8");
                         equal = false;
                     }
@@ -761,17 +901,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×8");
                         bracketedOperation += "×8";
@@ -781,8 +914,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "8";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -790,6 +929,14 @@ public class MainActivity extends AppCompatActivity {
         button9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                char lastChar;
+                try{
+                    lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
+                }
+                catch (Exception e){
+                    lastChar = ' ';
+                }
+
                 //If there is percentage sign in front of it
                 if(percentage){
                     buttonMultiply.performClick();
@@ -801,12 +948,21 @@ public class MainActivity extends AppCompatActivity {
                         if (infoTextEditor.getText().equals("0")) {//Situation that there is only 0 present
                             infoTextEditor.setText("9");
                         } else if (value2 == 0 && !decimal) {//Situation such as 1+0, if 1 has pressed we change to 1+1
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             String currentText = infoTextEditor.getText().toString();
                             infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1) + "9");
                         } else {
+                            if(lastChar == ')'){//Add multiplication automatically
+                                buttonMultiply.performClick();
+                            }
                             infoTextEditor.setText(infoTextEditor.getText() + "9");
                         }
                     } else {
+                        if(lastChar == ')'){//Add multiplication automatically
+                            buttonMultiply.performClick();
+                        }
                         infoTextEditor.setText("9");
                         equal = false;
                     }
@@ -842,17 +998,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         compute();
                     }
+                    emptyTextBracket = false;
                     zerosAfterDecimal = "";
                 }
                 else{//To be revised if develop way to calculate parentheses with percentage button
-                    char lastChar;
-                    try{
-                        lastChar= infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1);
-                    }
-                    catch (Exception e){
-                        lastChar = ' ';
-                    }
-
                     if(lastChar == ')'){//Add multiplication automatically
                         infoTextEditor.setText(infoTextEditor.getText() + "×9");
                         bracketedOperation += "×9";
@@ -862,8 +1011,14 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "9";
                     }
 
-                    value2 = bracketCal(bracketedOperation);
-                    compute();
+                    sign = false;
+                    if(emptyTextBracket){
+                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                    }
+                    else{
+                        value2 = bracketCal(bracketedOperation);
+                        compute();
+                    }
                 }
             }
         });
@@ -900,8 +1055,10 @@ public class MainActivity extends AppCompatActivity {
                         bracketedOperation += "×0.";
                     }
                     else{
-                        infoTextEditor.setText(infoTextEditor.getText() + ".");
-                        bracketedOperation += ".";
+                        if(lastChar != '(' || lastChar != '-') {//'-' for sign
+                            infoTextEditor.setText(infoTextEditor.getText() + ".");
+                            bracketedOperation += ".";
+                        }
                     }
 
                 }
@@ -935,7 +1092,12 @@ public class MainActivity extends AppCompatActivity {
                                 value1 = Double.parseDouble(value1String);
                                 value1 = value1 / 100;
                             } else {
-                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                if(emptyTextBracket){//We have parentheses operation fisrt
+                                    value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                                }
+                                else {
+                                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                }
                             }
                             waitForValue2 = true;
                         } else {//need to store previous operation result from resultTextEditor
@@ -956,7 +1118,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else{
-                    if(lastChar != '(') {
+                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
                         infoTextEditor.setText(infoTextEditor.getText() + "+");
                         bracketedOperation += "+";
                     }
@@ -991,7 +1153,12 @@ public class MainActivity extends AppCompatActivity {
                                 value1 = Double.parseDouble(value1String);
                                 value1 = value1 / 100;
                             } else {
-                                value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                if(emptyTextBracket){//We have parentheses operation fisrt
+                                    value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                                }
+                                else {
+                                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                }
                             }
                             waitForValue2 = true;
                         } else {//need to store previous operation result from resultTextEditor
@@ -1012,7 +1179,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else{
-                    if(lastChar != '(') {
+                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
                         infoTextEditor.setText(infoTextEditor.getText() + "-");
                         bracketedOperation += "-";
                     }
@@ -1083,7 +1250,12 @@ public class MainActivity extends AppCompatActivity {
                                     value1 = Double.parseDouble(value1String);
                                     value1 = value1 / 100;
                                 } else {
-                                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                    if(emptyTextBracket){//We have parentheses operation fisrt
+                                        value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                                    }
+                                    else {
+                                        value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                    }
                                 }
                                 waitForValue2 = true;
                             } else {//need to store previous operation result from resultTextEditor
@@ -1104,7 +1276,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else{
-                    if(lastChar != '(') {
+                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
                         infoTextEditor.setText(infoTextEditor.getText() + "×");
                         bracketedOperation += "×";
                     }
@@ -1175,7 +1347,12 @@ public class MainActivity extends AppCompatActivity {
                                     value1 = Double.parseDouble(value1String);
                                     value1 = value1 / 100;
                                 } else {
-                                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                    if(emptyTextBracket){//We have parentheses operation fisrt
+                                        value1 = Double.parseDouble(resultTextEditor.getText() + "");
+                                    }
+                                    else {
+                                        value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                                    }
                                 }
                                 waitForValue2 = true;
                             } else {//need to store previous operation result from resultTextEditor
@@ -1199,7 +1376,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else{
-                    if(lastChar != '(') {
+                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
                         infoTextEditor.setText(infoTextEditor.getText() + "÷");
                         bracketedOperation += "÷";
                     }
@@ -1306,23 +1483,40 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if(infoTextEditor.getText().length() == 0){//Empty text
-                    infoTextEditor.setText(infoTextEditor.getText() + "(");
-                    bracketedOperation += "(";
+                    emptyTextBracket = true;
+                    if(sign){//+/- button has been pressed
+                        infoTextEditor.setText(infoTextEditor.getText() + "(-");
+                        bracketedOperation += "(-";
+                    }else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "(");
+                        bracketedOperation += "(";
+                    }
                     numberOfOpenBracket += 1;
                     bracket = true;
                 }
                 else if (("0123456789".contains(lastChar + "") && !bracket) ||
                         (lastChar == ')' && numberOfOpenBracket== numberOfCloseBracket)) {//If there is a number or closed bracket in front
                     buttonMultiply.performClick();
-                    infoTextEditor.setText(infoTextEditor.getText() + "(");
-                    bracketedOperation += "(";
+
+                    if(sign){//+/- button has been pressed
+                        infoTextEditor.setText(infoTextEditor.getText() + "(-");
+                        bracketedOperation += "(-";
+                    }else {
+                        infoTextEditor.setText(infoTextEditor.getText() + "(");
+                        bracketedOperation += "(";
+                    }
                     numberOfOpenBracket += 1;
                     bracket = true;
                 }
                 else {//Normal situation
                     if ("+-×÷".contains(lastChar + "") || lastChar == '(') {//Continuously enter open bracket
-                        infoTextEditor.setText(infoTextEditor.getText() + "(");
-                        bracketedOperation += "(";
+                        if(sign){//+/- button has been pressed
+                            infoTextEditor.setText(infoTextEditor.getText() + "(-");
+                            bracketedOperation += "(-";
+                        }else {
+                            infoTextEditor.setText(infoTextEditor.getText() + "(");
+                            bracketedOperation += "(";
+                        }
                         numberOfOpenBracket += 1;
                         bracket = true;
                     }
@@ -1337,7 +1531,7 @@ public class MainActivity extends AppCompatActivity {
                 if(bracket && numberOfOpenBracket == numberOfCloseBracket){
                     numberOfOpenBracket = numberOfCloseBracket = 0;
                     bracketedOperation = "";
-                    bracket = false;
+                    bracket = sign = false;
                 }
             }
         });
@@ -1345,7 +1539,21 @@ public class MainActivity extends AppCompatActivity {
         buttonSign.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                if(!sign){
+                    sign = true;
+                    buttonBracket.performClick();
+                }
+                else{
+                    int length = infoTextEditor.getText().length();
+                    String currentText = infoTextEditor.getText().toString();
 
+                    //Remove sign for double click if no number has been entered
+                    if(infoTextEditor.getText().toString().substring(length - 2, length).equals("(-")){
+                        infoTextEditor.setText(currentText.substring(0, length - 2));
+                        bracketedOperation = bracketedOperation.substring(0, bracketedOperation.length() - 2);
+                        sign = false;
+                    }
+                }
             }
         });
 
@@ -1358,7 +1566,7 @@ public class MainActivity extends AppCompatActivity {
                 zerosAfterDecimal = bracketedOperation = "";
                 infoTextEditor.setText(null);
                 resultTextEditor.setText(null);
-                waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = equal = bracket = sign = false;
+                waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = equal = emptyTextBracket = bracket = sign = false;
                 numberOfOpenBracket = numberOfCloseBracket = 0;
             }
         });
@@ -1376,7 +1584,7 @@ public class MainActivity extends AppCompatActivity {
                     previousOperator = operatorBeforeBracket = null;
                     zerosAfterDecimal = bracketedOperation = "";
                     equal = true;
-                    waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = bracket =sign = false;
+                    waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = emptyTextBracket = bracket =sign = false;
                     numberOfOpenBracket = numberOfCloseBracket = 0;
                     infoTextEditor.setText(resultTextEditor.getText());
                     resultTextEditor.setText(null);
