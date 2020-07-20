@@ -1580,12 +1580,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!equal && !resultTextEditor.getText().equals("")){
-                    previousValue = value2 = Double.NaN;
-                    previousOperator = operatorBeforeBracket = null;
+                    operatorBeforeBracket = null;
                     zerosAfterDecimal = bracketedOperation = "";
                     equal = true;
-                    waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = emptyTextBracket = bracket =sign = false;
+                    waitForValue2 = percentage = decimal = emptyTextBracket = sign = false;
                     numberOfOpenBracket = numberOfCloseBracket = 0;
+                    infoTextEditor.setText(resultTextEditor.getText());
+                    resultTextEditor.setText(null);
+                }
+                else if(equal & !bracket){//Repeat same operation
+                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                    compute();
                     infoTextEditor.setText(resultTextEditor.getText());
                     resultTextEditor.setText(null);
                 }
@@ -1605,7 +1610,7 @@ public class MainActivity extends AppCompatActivity {
      * entered as an operand after any operator or any updates to the current operand.
      */
     private void compute() {
-        BigDecimal v1, v2, pV, cR, result, resultBD;
+        BigDecimal result, resultBD;
 
         if(addition){
             result = new BigDecimal(Double.toString(value1 + value2));
