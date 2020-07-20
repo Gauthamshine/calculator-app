@@ -836,7 +836,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             if (percentage) {
                                 int value2Length = Double.toString(value2*100).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 2));
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
                             } else {
                                 int value2Length = Double.toString(value2).length();
                                 previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
@@ -926,7 +926,7 @@ public class MainActivity extends AppCompatActivity {
                         else{
                             if(percentage){
                                 int value2Length = Double.toString(value2*100).length();
-                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 2));
+                                previousOperator = Character.toString(currentText.charAt(infoTextEditor.getText().length() - value2Length - 1));
                             }
                             else{
                                 int value2Length = Double.toString(value2).length();
@@ -1121,10 +1121,14 @@ public class MainActivity extends AppCompatActivity {
         BigDecimal v1, v2, pV, cR, result, resultBD;
 
         if(addition){
-            resultTextEditor.setText(format(value1 + value2));
+            result = new BigDecimal(Double.toString(value1 + value2));
+            resultBD = result.setScale(10, RoundingMode.HALF_UP);
+            resultTextEditor.setText(format(resultBD.doubleValue()));
         }
         else if(subtraction){
-            resultTextEditor.setText(format(value1 - value2));
+            result = new BigDecimal(Double.toString(value1 - value2));
+            resultBD = result.setScale(10, RoundingMode.HALF_UP);
+            resultTextEditor.setText(format(resultBD.doubleValue()));
         }
         else if(multiplication){
             //Situations that we need to compute × firstly
