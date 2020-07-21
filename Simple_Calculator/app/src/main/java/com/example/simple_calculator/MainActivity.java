@@ -25,13 +25,13 @@ import java.math.RoundingMode;
 public class MainActivity extends AppCompatActivity {
     //Button Variables that associate with the button on the layout:
     Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9, buttonDecimal, buttonEqual,
-            buttonClean, buttonPercent, buttonDivide, buttonMultiply, buttonSubtract, buttonAdd, buttonBracket, buttonSign;
+            buttonClean, buttonPercent, buttonDivide, buttonMultiply, buttonSubtract, buttonAdd, buttonBracket, buttonSign, buttonDelete;
 
     //TextView Variables that display any contents on the screen:
     TextView infoTextEditor, resultTextEditor;
 
     //Class variables use to determine the operation state of calculator:
-    boolean addition, subtraction, multiplication, division, percentage, decimal, waitForValue2, equal, emptyTextBracket, bracket, sign;
+    boolean addition, subtraction, multiplication, division, percentage, decimal, waitForValue2, equal, emptyTextBracket, bracket, sign, includeBracket, delete;
 
     //Class variables use to store operands' values:
     double previousValue = Double.NaN, previousResult, currentResult, value1, value2 = Double.NaN, beforePercentage;
@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         buttonAdd = (Button) findViewById(R.id.btn_Add);
         buttonSign = (Button) findViewById(R.id.btn_Sign);
         buttonBracket = (Button) findViewById(R.id.btn_Bracket);
+        buttonDelete = (Button) findViewById(R.id.btn_Delete);
 
         //TextEditor
         infoTextEditor = (TextView) findViewById(R.id.infoText);
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -236,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -333,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -430,7 +431,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -528,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -624,7 +625,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -721,7 +722,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -818,7 +819,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -915,7 +916,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -1012,7 +1013,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     sign = false;
-                    if(emptyTextBracket){
+                    if(emptyTextBracket || delete){
                         resultTextEditor.setText(format(bracketCal(bracketedOperation)));
                     }
                     else{
@@ -1076,15 +1077,15 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                if(!bracket) {
-                    //Make sure that there is operand and the add button has not pressed yet
-                    if (infoTextEditor.getText().length() != 0 && lastChar != '+') {
-                        //If user want to change operation from the others to add before input value2
-                        if ("-×÷".contains(lastChar + "")) {
-                            infoTextEditor.setText(infoTextEditor.getText().toString().
-                                    substring(0, infoTextEditor.getText().length() - 1));
-                        }
+                //Make sure that there is operand and the add button has not pressed yet
+                if (infoTextEditor.getText().length() != 0 && lastChar != '+') {
+                    //If user want to change operation from the others to add before input value2
+                    if ("-×÷".contains(lastChar + "")) {
+                        infoTextEditor.setText(infoTextEditor.getText().toString().
+                                substring(0, infoTextEditor.getText().length() - 1));
+                    }
 
+                    if(!bracket) {
                         if (!waitForValue2) {//no need to store previous operation result
                             if (percentage) {
                                 String value1String = infoTextEditor.getText().toString().
@@ -1116,11 +1117,11 @@ public class MainActivity extends AppCompatActivity {
                         infoTextEditor.setText(infoTextEditor.getText() + "+");
                         resultTextEditor.setText(null);
                     }
-                }
-                else{
-                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
-                        infoTextEditor.setText(infoTextEditor.getText() + "+");
-                        bracketedOperation += "+";
+                    else{
+                        if(lastChar != '(' || lastChar != '-') {//'-' for sign
+                            infoTextEditor.setText(infoTextEditor.getText() + "+");
+                            bracketedOperation += "+";
+                        }
                     }
                 }
             }
@@ -1137,15 +1138,15 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                if(!bracket) {
-                    //Make sure that there is operand and the subtract button has not pressed yet
-                    if (infoTextEditor.getText().length() != 0 && lastChar != '-') {
-                        //If user want to change operation from the others to subtract before input value2
-                        if ("+×÷".contains(lastChar + "")) {
-                            infoTextEditor.setText(infoTextEditor.getText().toString().
-                                    substring(0, infoTextEditor.getText().length() - 1));
-                        }
+                //Make sure that there is operand and the subtract button has not pressed yet
+                if (infoTextEditor.getText().length() != 0 && lastChar != '-') {
+                    //If user want to change operation from the others to subtract before input value2
+                    if ("+×÷".contains(lastChar + "")) {
+                        infoTextEditor.setText(infoTextEditor.getText().toString().
+                                substring(0, infoTextEditor.getText().length() - 1));
+                    }
 
+                    if(!bracket) {
                         if (!waitForValue2) {//no need to store previous operation result
                             if (percentage) {
                                 String value1String = infoTextEditor.getText().toString().
@@ -1177,11 +1178,11 @@ public class MainActivity extends AppCompatActivity {
                         infoTextEditor.setText(infoTextEditor.getText() + "-");
                         resultTextEditor.setText(null);
                     }
-                }
-                else{
-                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
-                        infoTextEditor.setText(infoTextEditor.getText() + "-");
-                        bracketedOperation += "-";
+                    else{
+                        if(lastChar != '(' || lastChar != '-') {//'-' for sign
+                            infoTextEditor.setText(infoTextEditor.getText() + "-");
+                            bracketedOperation += "-";
+                        }
                     }
                 }
             }
@@ -1201,15 +1202,16 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                if(!bracket) {
-                    //Make sure that there is operand and the multiply button has not pressed yet
-                    if (infoTextEditor.getText().length() != 0 && lastChar != '×') {
-                        String currentText = infoTextEditor.getText().toString();
-                        //If user want to change operation from the others to multiply before input value2
-                        if ("+-÷".contains(lastChar + "")) {
-                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1));
-                        }
 
+                //Make sure that there is operand and the multiply button has not pressed yet
+                if (infoTextEditor.getText().length() != 0 && lastChar != '×') {
+                    String currentText = infoTextEditor.getText().toString();
+                    //If user want to change operation from the others to multiply before input value2
+                    if ("+-÷".contains(lastChar + "")) {
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1));
+                    }
+
+                    if(!bracket) {
                         //Determine previous operator
                         try {
                             if (!decimal) {
@@ -1274,11 +1276,11 @@ public class MainActivity extends AppCompatActivity {
                         infoTextEditor.setText(infoTextEditor.getText() + "×");
                         resultTextEditor.setText(null);
                     }
-                }
-                else{
-                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
-                        infoTextEditor.setText(infoTextEditor.getText() + "×");
-                        bracketedOperation += "×";
+                    else{
+                        if(lastChar != '(' || lastChar != '-') {//'-' for sign
+                            infoTextEditor.setText(infoTextEditor.getText() + "×");
+                            bracketedOperation += "×";
+                        }
                     }
                 }
             }
@@ -1298,15 +1300,15 @@ public class MainActivity extends AppCompatActivity {
                     lastChar = ' ';
                 }
 
-                if(!bracket) {
-                    //Make sure that there is operand and the divide button has not pressed yet
-                    if (infoTextEditor.getText().length() != 0 && lastChar != '÷') {
-                        String currentText = infoTextEditor.getText().toString();
-                        //If user want to change operation from the others to multiply before input value2
-                        if ("+-×".contains(lastChar + "")) {
-                            infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1));
-                        }
+                //Make sure that there is operand and the divide button has not pressed yet
+                if (infoTextEditor.getText().length() != 0 && lastChar != '÷') {
+                    String currentText = infoTextEditor.getText().toString();
+                    //If user want to change operation from the others to multiply before input value2
+                    if ("+-×".contains(lastChar + "")) {
+                        infoTextEditor.setText(currentText.substring(0, infoTextEditor.getText().length() - 1));
+                    }
 
+                    if(!bracket) {
                         //Determine previous operator
                         try {
                             if (!decimal) {
@@ -1374,11 +1376,11 @@ public class MainActivity extends AppCompatActivity {
                         infoTextEditor.setText(infoTextEditor.getText() + "÷");
                         resultTextEditor.setText(null);
                     }
-                }
-                else{
-                    if(lastChar != '(' || lastChar != '-') {//'-' for sign
-                        infoTextEditor.setText(infoTextEditor.getText() + "÷");
-                        bracketedOperation += "÷";
+                    else{
+                        if(lastChar != '(' || lastChar != '-') {//'-' for sign
+                            infoTextEditor.setText(infoTextEditor.getText() + "÷");
+                            bracketedOperation += "÷";
+                        }
                     }
                 }
             }
@@ -1520,7 +1522,7 @@ public class MainActivity extends AppCompatActivity {
                         numberOfOpenBracket += 1;
                         bracket = true;
                     }
-                    else if ("0123456789".contains(lastChar + "") || lastChar == ')'){//Situation to enter close bracket
+                    else if (("0123456789".contains(lastChar + "") || lastChar == ')') && bracketedOperation.contains("(")){//Situation to enter close bracket
                         infoTextEditor.setText(infoTextEditor.getText() + ")");
                         bracketedOperation += ")";//To be removed
                         numberOfCloseBracket += 1;
@@ -1557,6 +1559,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        buttonDelete.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(infoTextEditor.getText().length() != 0) {
+                    delete = bracket = true;
+                    //Delete one character
+                    bracketedOperation = infoTextEditor.getText().toString().substring(0, infoTextEditor.getText().length() - 1);
+                    infoTextEditor.setText(bracketedOperation);
+
+                    if(bracketedOperation.length() == 0){
+                        buttonClean.performClick();
+                    }else {
+                        char lastChar;
+                        try {
+                            lastChar = bracketedOperation.charAt(bracketedOperation.length() - 1);
+                        } catch (Exception e) {
+                            lastChar = ' ';
+                        }
+
+                        if (!bracketedOperation.contains("+") && !bracketedOperation.contains("-") &&
+                                !bracketedOperation.contains("×") && !bracketedOperation.contains("÷")) {//only number
+                            value1 = Double.parseDouble(bracketedOperation);
+                            infoTextEditor.setText(format(value1) + "");
+                        } else {
+                            if ("0123456789".contains(lastChar + "") || lastChar == ')') {//Deleted to digit
+                                resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                            }
+                            else if ("+-×÷".contains(lastChar + "") || lastChar == '(') {//Deleted to operator
+                                resultTextEditor.setText("");
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         //Clean button that resets all variables to initial state
         buttonClean.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -1566,7 +1604,8 @@ public class MainActivity extends AppCompatActivity {
                 zerosAfterDecimal = bracketedOperation = "";
                 infoTextEditor.setText(null);
                 resultTextEditor.setText(null);
-                waitForValue2 = addition = subtraction = multiplication = division = percentage = decimal = equal = emptyTextBracket = bracket = sign = false;
+                waitForValue2 = addition = subtraction = multiplication = division = percentage =
+                        decimal = equal = emptyTextBracket = bracket = includeBracket = sign = delete = false;
                 numberOfOpenBracket = numberOfCloseBracket = 0;
             }
         });
@@ -1583,16 +1622,27 @@ public class MainActivity extends AppCompatActivity {
                     operatorBeforeBracket = null;
                     zerosAfterDecimal = bracketedOperation = "";
                     equal = true;
-                    waitForValue2 = percentage = decimal = emptyTextBracket = sign = false;
+                    waitForValue2 = percentage = decimal = emptyTextBracket = bracket = sign = delete = false;
                     numberOfOpenBracket = numberOfCloseBracket = 0;
+
+                    if((infoTextEditor.getText().toString().charAt(0) != '(' ||
+                            infoTextEditor.getText().toString().charAt(infoTextEditor.getText().length()-1) != ')') && Double.isNaN(value2)){
+                        includeBracket = true;
+                    }
+
                     infoTextEditor.setText(resultTextEditor.getText());
                     resultTextEditor.setText(null);
                 }
-                else if(equal & !bracket){//Repeat same operation
-                    value1 = Double.parseDouble(infoTextEditor.getText() + "");
-                    compute();
-                    infoTextEditor.setText(resultTextEditor.getText());
-                    resultTextEditor.setText(null);
+                else if(equal){//Repeat same operation
+                    if(!includeBracket) {
+                        value1 = Double.parseDouble(infoTextEditor.getText() + "");
+                        compute();
+                        infoTextEditor.setText(resultTextEditor.getText());
+                        resultTextEditor.setText(null);
+                    }
+                    else{//No operation to repeat
+                        includeBracket = equal = false;
+                    }
                 }
             }
         });
