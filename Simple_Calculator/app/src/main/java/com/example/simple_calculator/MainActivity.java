@@ -141,7 +141,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -238,7 +240,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -335,7 +339,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -432,7 +438,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -530,7 +538,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -626,7 +636,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -723,7 +735,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -820,7 +834,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -917,7 +933,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -1014,7 +1032,9 @@ public class MainActivity extends AppCompatActivity {
 
                     sign = false;
                     if(emptyTextBracket || delete){
-                        resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                        BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                        BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                        resultTextEditor.setText(format(resultBD.doubleValue()));
                     }
                     else{
                         value2 = bracketCal(bracketedOperation);
@@ -1252,7 +1272,7 @@ public class MainActivity extends AppCompatActivity {
                                     value1 = Double.parseDouble(value1String);
                                     value1 = value1 / 100;
                                 } else {
-                                    if(emptyTextBracket){//We have parentheses operation fisrt
+                                    if(emptyTextBracket){//We have parentheses operation first
                                         value1 = Double.parseDouble(resultTextEditor.getText() + "");
                                     }
                                     else {
@@ -1562,7 +1582,7 @@ public class MainActivity extends AppCompatActivity {
         buttonDelete.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if(infoTextEditor.getText().length() != 0) {
+                if(infoTextEditor.getText().length() != 0 && !percentage) {
                     delete = bracket = true;
                     //Delete one character
                     bracketedOperation = infoTextEditor.getText().toString().substring(0, infoTextEditor.getText().length() - 1);
@@ -1583,8 +1603,10 @@ public class MainActivity extends AppCompatActivity {
                             value1 = Double.parseDouble(bracketedOperation);
                             infoTextEditor.setText(format(value1) + "");
                         } else {
-                            if ("0123456789".contains(lastChar + "") || lastChar == ')') {//Deleted to digit
-                                resultTextEditor.setText(format(bracketCal(bracketedOperation)));
+                            if ("0123456789.".contains(lastChar + "") || lastChar == ')') {//Deleted to digit
+                                BigDecimal result = new BigDecimal(bracketCal(bracketedOperation));
+                                BigDecimal resultBD = result.setScale(10, RoundingMode.HALF_UP);
+                                resultTextEditor.setText(format(resultBD.doubleValue()));
                             }
                             else if ("+-×÷".contains(lastChar + "") || lastChar == '(') {//Deleted to operator
                                 resultTextEditor.setText("");
